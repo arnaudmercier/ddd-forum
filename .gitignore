@@ -1,0 +1,9 @@
+**/.idea/
+**/.vscode/
+**/.DS_Store
+**/teaching/
+**/template**
+**/dev.db
+**/node_modules
+**/dist
+**/service-key.json
