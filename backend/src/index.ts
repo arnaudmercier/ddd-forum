@@ -1,11 +1,14 @@
 import express, {Request, Response} from "express";
 import {ApiResponse} from "./response";
 import {Pool} from 'pg';
+import {User} from "./user";
+import {UserRepository} from "./user-repository";
 
+const userRepository = new UserRepository();
 const app = express();
 app.use(express.json());
 
-let pool = new Pool({
+export let pool = new Pool({
     user: 'postgres',
     host: 'localhost',
     database: 'users',
@@ -13,11 +16,16 @@ let pool = new Pool({
     port: 5432,
 });
 
-pool.query('select 1+1 as result').then(() => {
-    console.log('Connected to the database successfully');
-}).catch((error) => {
-    console.error('Error connecting to the database:', error);
-});
+pool.query(`
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                username VARCHAR(255) UNIQUE NOT NULL,
+                first_name VARCHAR(100) NOT NULL,
+                last_name VARCHAR(100) NOT NULL,
+                password VARCHAR(100) NOT NULL
+                )
+        `);
 
 app.post('/users/new', async (request: Request, response: Response) => {
     console.log('Called /users/new endpoint');
@@ -27,6 +35,16 @@ app.post('/users/new', async (request: Request, response: Response) => {
             new ApiResponse('ValidationError', undefined, false)
         );
     }
+
+    const user = new User(
+        request.body.email,
+        request.body.username,
+        request.body.firstName,
+        request.body.lastName,
+        'TODO: random password'
+    );
+
+    await userRepository.save(user)
 
     const successResponse = new ApiResponse(undefined, {
         id: 'generated-user-id',
