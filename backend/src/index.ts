@@ -55,12 +55,12 @@ async function initializeDatabase(): Promise<void> {
 
         await pool.query(`
             CREATE TABLE IF NOT EXISTS users (
-                                                 id SERIAL PRIMARY KEY,
-                                                 email VARCHAR(255) UNIQUE NOT NULL,
-                                                 username VARCHAR(255) UNIQUE NOT NULL,
-                                                 first_name VARCHAR(100) NOT NULL,
-                                                 last_name VARCHAR(100) NOT NULL,
-                                                 password VARCHAR(100) NOT NULL
+                 id SERIAL PRIMARY KEY,
+                 email VARCHAR(255) UNIQUE NOT NULL,
+                 username VARCHAR(255) UNIQUE NOT NULL,
+                 first_name VARCHAR(100) NOT NULL,
+                 last_name VARCHAR(100) NOT NULL,
+                 password VARCHAR(100) NOT NULL
             )
         `);
         console.log('Database initialized: users table is ready');

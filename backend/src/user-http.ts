@@ -23,10 +23,10 @@ router.post('/users/new', async (request: Request, response: Response) => {
         'TODO: random password'
     );
 
-    await userRepository.save(user)
+    const userId = await userRepository.save(user)
 
     const successResponse = new ApiResponse(undefined, {
-        id: 'generated-user-id',
+        id: userId,
         email: request.body.email,
         username: request.body.username,
         firstName: request.body.firstName,
