@@ -38,7 +38,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^8.0.1",
     "jest": "^28.1.3",
-    "nodemon": "^2.0.19",
+    "nodemon": "^3.1.11",
     "onchange": "^7.1.0",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
@@ -49,6 +49,6 @@
   },
   "dependencies": {
     "express": "^5.2.1",
-    "jest-cucumber": "^3.0.1"
+    "jest-cucumber": "^4.5.0"
   }
 }
