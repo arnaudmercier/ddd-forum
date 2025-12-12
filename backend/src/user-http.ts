@@ -29,6 +29,14 @@ router.post('/users/new', async (request: Request, response: Response) => {
         );
     }
 
+    const emailExists = await userRepository.emailExists(user.email);
+    if (emailExists) {
+        return response.status(409).json(
+            new ApiResponse('EmailAlreadyInUse', undefined, false)
+        );
+    }
+
+
     const userId = await userRepository.save(user)
 
     const successResponse = new ApiResponse(undefined, {
