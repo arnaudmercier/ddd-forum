@@ -28,6 +28,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/pg": "^8.16.0",
     "@types/express": "^5.0.6",
     "@types/jest": "^28.1.8",
     "@types/node": "^18.6.1",
@@ -50,6 +51,7 @@
   },
   "dependencies": {
     "express": "^5.2.1",
-    "jest-cucumber": "^4.5.0"
+    "jest-cucumber": "^4.5.0",
+    "pg": "^8.16.3"
   }
 }
