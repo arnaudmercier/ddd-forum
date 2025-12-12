@@ -5,13 +5,16 @@ export class User {
     lastName: string;
     password: string;
 
-    constructor(email: string, username: string, firstName: string, lastName: string, password: string) {
+    constructor(email: string, username: string, firstName: string, lastName: string) {
         this.email = email;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.password = password;
+        this.password = this.createRandomPassword();
     }
 
+    createRandomPassword(): string {
+        return Math.random().toString(36).slice(-8);
+    }
 }
 

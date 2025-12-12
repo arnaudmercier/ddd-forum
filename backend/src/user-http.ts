@@ -19,8 +19,7 @@ router.post('/users/new', async (request: Request, response: Response) => {
         request.body.email,
         request.body.username,
         request.body.firstName,
-        request.body.lastName,
-        'TODO: random password'
+        request.body.lastName
     );
 
     const userId = await userRepository.save(user)
