@@ -1,8 +1,23 @@
 import express, {Request, Response} from "express";
 import {ApiResponse} from "./response";
+import {Pool} from 'pg';
 
 const app = express();
 app.use(express.json());
+
+let pool = new Pool({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'users',
+    password: 'demo',
+    port: 5432,
+});
+
+pool.query('select 1+1 as result').then(() => {
+    console.log('Connected to the database successfully');
+}).catch((error) => {
+    console.error('Error connecting to the database:', error);
+});
 
 app.post('/users/new', async (request: Request, response: Response) => {
     console.log('Called /users/new endpoint');
