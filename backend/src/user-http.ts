@@ -22,6 +22,13 @@ router.post('/users/new', async (request: Request, response: Response) => {
         request.body.lastName
     );
 
+    const usernameExists = await userRepository.usernameExists(user.username);
+    if (usernameExists) {
+        return response.status(409).json(
+            new ApiResponse('UsernameAlreadyTaken', undefined, false)
+        );
+    }
+
     const userId = await userRepository.save(user)
 
     const successResponse = new ApiResponse(undefined, {
