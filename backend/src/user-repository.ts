@@ -36,6 +36,23 @@ export class UserRepository {
         });
     }
 
+    emailExists(email: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            pool.query(
+                'SELECT COUNT(1) FROM users WHERE email = $1',
+                [email],
+                (error, results) => {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
+                    const count = parseInt(results.rows[0].count, 10);
+                    resolve(count > 0);
+                }
+            );
+        });
+    }
+
 }
 
 
