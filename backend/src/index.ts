@@ -7,6 +7,12 @@ app.use(express.json());
 app.post('/users/new', async (request: Request, response: Response) => {
     console.log('Called /users/new endpoint');
 
+    if (!request.body.email || !request.body.username || !request.body.firstName || !request.body.lastName) {
+        return response.status(400).json(
+            new ApiResponse('ValidationError', undefined, false)
+        );
+    }
+
     const successResponse = new ApiResponse(undefined, {
         id: 'generated-user-id',
         email: request.body.email,
