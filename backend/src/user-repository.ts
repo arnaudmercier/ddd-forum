@@ -19,6 +19,23 @@ export class UserRepository {
         });
     }
 
+    usernameExists(username: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            pool.query(
+                'SELECT COUNT(1) FROM users WHERE username = $1',
+                [username],
+                (error, results) => {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
+                    const count = parseInt(results.rows[0].count, 10);
+                    resolve(count > 0);
+                }
+            );
+        });
+    }
+
 }
 
 
