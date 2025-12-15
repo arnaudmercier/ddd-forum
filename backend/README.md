@@ -19,3 +19,10 @@
 curl -X POST "http://localhost:3000/users/new" -H "Content-Type: application/json" -d '{ "email":"john@test.com", "username":"john.dode", "firstName":"John", "lastName":"Doe" }'
 ```
 
+### edit users
+
+```bash
+# 200
+curl -X POST "http://localhost:3000/users/edit/1" -H "Content-Type: application/json" -d '{ "email":"john@test.com", "username":"john.dode", "firstName":"John", "lastName":"Doe" }'
+```
+
