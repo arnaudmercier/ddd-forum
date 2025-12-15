@@ -3,7 +3,7 @@ import {User} from "./user";
 
 export class UserRepository {
 
-    save(user: User): Promise<string> {
+    save(user: User): Promise<number> {
         return new Promise((resolve, reject) => {
             pool.query(
                 'INSERT INTO users (username, email, first_name, last_name, password) VALUES ($1, $2, $3, $4, $5) RETURNING id',
