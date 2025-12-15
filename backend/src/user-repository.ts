@@ -19,6 +19,26 @@ export class UserRepository {
         });
     }
 
+    update(userId: number, user: User): Promise<void> {
+        return new Promise((resolve, reject) => {
+            pool.query(
+                `UPDATE users 
+                           SET username = $2, 
+                               email = $3, 
+                               first_name = $4, 
+                               last_name = $5 
+                           WHERE id = $1`,
+                [userId, user.username, user.email, user.firstName, user.lastName],
+                (error, results) => {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
+                    resolve();
+                })
+        });
+    }
+
     usernameExists(username: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             pool.query(
