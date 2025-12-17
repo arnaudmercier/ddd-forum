@@ -6,6 +6,30 @@ import {UserRepository} from "./user-repository";
 const router = Router();
 const userRepository = new UserRepository();
 
+router.post('/users', async (request: Request, response: Response) => {
+    try {
+        if(!request.query.email) {
+            return response.status(400).json(
+                new ApiResponse('MissingEmailQueryParameter', undefined, false)
+            );
+        }
+        const email = request.query.email.toString();
+        console.log(`Call /users endpoint with email: ${email}`);
+        const user = await userRepository.findByEmail(email);
+        if (user) {
+            return response.status(200).json(
+                new ApiResponse(undefined, user, true)
+            );
+        } else {
+            return response.status(404).json(
+                new ApiResponse('UserNotFound', undefined, false)
+            );
+        }
+    } catch (error) {
+        returnHttp500OnError(response, error);
+    }
+})
+
 router.post('/users/new', async (request: Request, response: Response) => {
     try {
         console.log('Called /users/new endpoint');

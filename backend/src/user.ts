@@ -18,3 +18,10 @@ export class User {
     }
 }
 
+export interface UserResponse {
+    id: number;
+    email: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+}

@@ -16,13 +16,19 @@
 
 ```bash
 # 201
-curl -X POST "http://localhost:3000/users/new" -H "Content-Type: application/json" -d '{ "email":"john@test.com", "username":"john.dode", "firstName":"John", "lastName":"Doe" }'
+curl -X POST "http://localhost:3000/users/new" -H "Content-Type: application/json" -d '{ "email":"john@test.com", "username":"john.doe", "firstName":"John", "lastName":"Doe" }'
 ```
 
 ### edit users
 
 ```bash
 # 200
-curl -X POST "http://localhost:3000/users/edit/1" -H "Content-Type: application/json" -d '{ "email":"john@test.com", "username":"john.dode", "firstName":"John", "lastName":"Doe" }'
+curl -X POST "http://localhost:3000/users/edit/1" -H "Content-Type: application/json" -d '{ "email":"jane@test.com", "username":"jane.dode", "firstName":"Jane", "lastName":"Doe" }'
 ```
 
+### find user by email
+
+```bash
+# 200
+curl -X POST "http://localhost:3000/users?email=john@test.com" 
+```
