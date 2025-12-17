@@ -9,10 +9,21 @@ const userRepository = new UserRepository();
 router.post('/users/new', async (request: Request, response: Response) => {
     try {
         console.log('Called /users/new endpoint');
-        returnHttp400WhenValidationError(request, response);
+
+        if (returnHttp400WhenValidationError(request, response)) {
+            return;
+        }
+
         const user = createUserFrom(request);
-        await returnHttp409WhenUsernameAlreadyTaken(user.username, response);
-        await returnHttp409WhenEmailAlreadyInUse(user.email, response);
+
+        if (await returnHttp409WhenUsernameAlreadyTaken(user.username, response)) {
+            return;
+        }
+
+        if (await returnHttp409WhenEmailAlreadyInUse(user.email, response)) {
+            return;
+        }
+
         const userId = await userRepository.save(user)
         returnHttpResponse(201, response, userId, request);
     } catch (error) {
@@ -23,11 +34,22 @@ router.post('/users/new', async (request: Request, response: Response) => {
 router.post('/users/edit/:userId', async (request: Request, response: Response) => {
     try {
         const userId = parseInt(request.params.userId);
-        console.log(`Called /users/ endpoint ${userId}`);
-        returnHttp400WhenValidationError(request, response);
+        console.log(`Called /users/ endpoint with userId: ${userId}`);
+
+        if (returnHttp400WhenValidationError(request, response)) {
+            return;
+        }
+
         const user = createUserFrom(request);
-        await returnHttp409WhenUsernameAlreadyTaken(user.username, response);
-        await returnHttp409WhenEmailAlreadyInUse(user.email, response);
+
+        if (await returnHttp409WhenUsernameAlreadyTaken(user.username, response)) {
+            return;
+        }
+
+        if (await returnHttp409WhenEmailAlreadyInUse(user.email, response)) {
+            return;
+        }
+
         await userRepository.update(userId, user)
         returnHttpResponse(200, response, userId, request);
     } catch (error) {
@@ -35,29 +57,36 @@ router.post('/users/edit/:userId', async (request: Request, response: Response) 
     }
 });
 
-function returnHttp400WhenValidationError(request: Request, response: Response) {
+function returnHttp400WhenValidationError(request: Request, response: Response): boolean {
     if (!request.body.email || !request.body.username || !request.body.firstName || !request.body.lastName) {
-        return response.status(400).json(
+        response.status(400).json(
             new ApiResponse('ValidationError', undefined, false)
         );
+        return true;
     }
+    return false;
 }
 
-async function returnHttp409WhenUsernameAlreadyTaken(username: string, response: Response) {
+async function returnHttp409WhenUsernameAlreadyTaken(username: string, response: Response): Promise<boolean> {
     if (await userRepository.usernameExists(username)) {
-        return response.status(409).json(
+        console.log("Username already taken:", username);
+        response.status(409).json(
             new ApiResponse('UsernameAlreadyTaken', undefined, false)
         );
+        return true;
     }
+    return false;
 }
 
-async function returnHttp409WhenEmailAlreadyInUse(email: string, response: Response) {
-    const emailExists = await userRepository.emailExists(email);
-    if (emailExists) {
-        return response.status(409).json(
+async function returnHttp409WhenEmailAlreadyInUse(email: string, response: Response): Promise<boolean> {
+    if (await userRepository.emailExists(email)) {
+        console.log("Email already in use:", email);
+        response.status(409).json(
             new ApiResponse('EmailAlreadyInUse', undefined, false)
         );
+        return true;
     }
+    return false;
 }
 
 function createUserFrom(request: Request) {
