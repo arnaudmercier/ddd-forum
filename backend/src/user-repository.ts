@@ -1,9 +1,10 @@
 import {pool} from "./index";
-import {User} from "./user";
+import {User, UserResponse} from "./user";
 
 export class UserRepository {
 
     save(user: User): Promise<number> {
+        console.log('Saving user to database:', user);
         return new Promise((resolve, reject) => {
             pool.query(
                 'INSERT INTO users (username, email, first_name, last_name, password) VALUES ($1, $2, $3, $4, $5) RETURNING id',
@@ -68,6 +69,40 @@ export class UserRepository {
                     }
                     const count = parseInt(results.rows[0].count, 10);
                     resolve(count > 0);
+                }
+            );
+        });
+    }
+
+    findByEmail(email: string): Promise<UserResponse | null> {
+        console.log('Finding user by email:', email);
+        return new Promise((resolve, reject) => {
+            pool.query(
+                'SELECT * FROM users WHERE email = $1',
+                [email],
+                (error, results) => {
+                    if (error) {
+                        console.log('Error querying database:', error);
+                        reject(error);
+                        return;
+                    }
+                    if (results.rows.length === 0) {
+                        console.log('No user found with email:', email);
+                        resolve(null);
+                        return;
+                    }
+                    const row = results.rows[0];
+                    console.log('User found:', row);
+                    const user: UserResponse = {
+                        id: row.id,
+                        email: row.email,
+                        username: row.username,
+                        firstName: row.first_name,
+                        lastName: row.last_name
+                    };
+
+                    resolve(user);
+
                 }
             );
         });
