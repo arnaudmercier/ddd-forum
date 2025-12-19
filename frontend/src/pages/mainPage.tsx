@@ -1,13 +1,9 @@
-import {Header} from "./header.tsx";
-import {Post} from "./post.tsx";
+import {Layout} from "./layout.tsx";
 
 export const MainPage = () => {
     return (
-        <div id="root">
-            <Header/>
-            <div className="content-container">
-                <Post/>
-            </div>
-        </div>
+        <Layout>
+            <div className="content">post</div>
+        </Layout>
     )
 }
