@@ -1,6 +1,7 @@
 import {Layout} from "./layout"
 import toast, {Toaster} from "react-hot-toast";
 import {useNavigate} from "react-router-dom";
+import axios from "axios";
 
 export const Registration = () => {
     const navigate = useNavigate();
@@ -17,13 +18,24 @@ export const Registration = () => {
             return
         }
 
-        console.log("Receive registration request for:" + {email, username, firstName, lastName})
-
-        toast.success("Registration successful", {'position': 'top-right', removeDelay: timeoutInMsBeforeSuccessfulRedirect});
-
-        setTimeout(() => {
-            navigate('/');
-        }, timeoutInMsBeforeSuccessfulRedirect);
+        const user = {email: email, username: username, firstName: firstName, lastName: lastName}
+        console.log("Receive registration request for:" + user)
+        axios
+            .post("http://localhost:3000/users/new", user)
+            .then((response) => {
+                console.log("registration ok", response);
+                toast.success("Registration successful", {
+                    'position': 'top-right',
+                    removeDelay: timeoutInMsBeforeSuccessfulRedirect
+                });
+                setTimeout(() => {
+                    navigate('/');
+                }, timeoutInMsBeforeSuccessfulRedirect);
+            })
+            .catch((err) => {
+                console.log("registration ko", err);
+                toast.error('Error from API: ' + err.message, {'position': 'top-right'});
+            });
     }
 
     return (
