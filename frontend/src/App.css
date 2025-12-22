@@ -190,3 +190,10 @@ body {
     font-size: 1rem;
     box-sizing: border-box;
 }
+
+.submit-button {
+    background-color: #646cff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
