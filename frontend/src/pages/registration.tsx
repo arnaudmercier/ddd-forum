@@ -2,6 +2,7 @@ import {Layout} from "./layout"
 import toast, {Toaster} from "react-hot-toast";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
+import config from "../config.json"
 
 export const Registration = () => {
     const navigate = useNavigate();
@@ -21,7 +22,7 @@ export const Registration = () => {
         const user = {email: email, username: username, firstName: firstName, lastName: lastName}
         console.log("Receive registration request for:" + user)
         axios
-            .post("http://localhost:3000/users/new", user)
+            .post(config.API_URL + "/users/new", user)
             .then((response) => {
                 console.log("registration ok", response);
                 toast.success("Registration successful", {
