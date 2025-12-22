@@ -4,7 +4,7 @@ import {useNavigate} from "react-router-dom";
 
 export const Registration = () => {
     const navigate = useNavigate();
-    const timeoutInMsBeforeSuccessfulRedirect = 2000;
+    const timeoutInMsBeforeSuccessfulRedirect = 3000;
 
     function register(formData: FormData) {
         const email = formData.get("email") as string
