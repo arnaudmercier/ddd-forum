@@ -2,13 +2,14 @@ import {Request, Response, Router} from "express";
 import {ApiResponse} from "./response";
 import {User} from "./user";
 import {UserRepository} from "./user-repository";
+import cors from "cors";
 
 const router = Router();
 const userRepository = new UserRepository();
 
-router.post('/users', async (request: Request, response: Response) => {
+router.post('/users', cors(), async (request: Request, response: Response) => {
     try {
-        if(!request.query.email) {
+        if (!request.query.email) {
             return response.status(400).json(
                 new ApiResponse('MissingEmailQueryParameter', undefined, false)
             );
@@ -30,7 +31,7 @@ router.post('/users', async (request: Request, response: Response) => {
     }
 })
 
-router.post('/users/new', async (request: Request, response: Response) => {
+router.post('/users/new', cors(), async (request: Request, response: Response) => {
     try {
         console.log('Called /users/new endpoint');
 
@@ -55,7 +56,7 @@ router.post('/users/new', async (request: Request, response: Response) => {
     }
 });
 
-router.post('/users/edit/:userId', async (request: Request, response: Response) => {
+router.post('/users/edit/:userId', cors(), async (request: Request, response: Response) => {
     try {
         const userId = parseInt(request.params.userId);
         console.log(`Called /users/ endpoint with userId: ${userId}`);

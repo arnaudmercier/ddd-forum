@@ -3,10 +3,14 @@ import {Pool} from 'pg';
 import router from "./user-http";
 import {Config} from "./config";
 
+require('dotenv').config()
+import cors from 'cors';
+
 const app = express();
 app.use(express.json());
+app.use(cors())
 app.use(router);
-require('dotenv').config()
+
 let config: Config;
 export let pool: Pool;
 
