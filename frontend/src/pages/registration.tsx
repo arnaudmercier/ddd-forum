@@ -1,7 +1,11 @@
 import {Layout} from "./layout"
 import toast, {Toaster} from "react-hot-toast";
+import {useNavigate} from "react-router-dom";
 
 export const Registration = () => {
+    const navigate = useNavigate();
+    const timeoutInMsBeforeSuccessfulRedirect = 2000;
+
     function register(formData: FormData) {
         const email = formData.get("email") as string
         const username = formData.get("username") as string
@@ -14,6 +18,12 @@ export const Registration = () => {
         }
 
         console.log("Receive registration request for:" + {email, username, firstName, lastName})
+
+        toast.success("Registration successful", {'position': 'top-right', removeDelay: timeoutInMsBeforeSuccessfulRedirect});
+
+        setTimeout(() => {
+            navigate('/');
+        }, timeoutInMsBeforeSuccessfulRedirect);
     }
 
     return (
