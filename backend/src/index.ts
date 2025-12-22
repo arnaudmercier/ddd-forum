@@ -1,4 +1,4 @@
-import express, {Request, Response} from "express";
+import express from "express";
 import {createUserRouter} from "./user-http";
 import {Config} from "./config";
 import cors from 'cors';
