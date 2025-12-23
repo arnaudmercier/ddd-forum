@@ -216,3 +216,10 @@ body {
     font-weight: bold;
     color: #333;
 }
+.post-item-upvote {
+    cursor: pointer;
+    color: #646cff;
+}
+.post-item-downvote {
+    cursor: pointer;
+}
