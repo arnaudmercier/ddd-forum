@@ -197,3 +197,22 @@ body {
     border: none;
     cursor: pointer;
 }
+.header-action-button {
+    border: 1px solid #646cff;
+    color: #646cff;
+    padding: 5px 16px;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.header-actions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px;
+}
+.header-login-name {
+    font-weight: bold;
+    color: #333;
+}
