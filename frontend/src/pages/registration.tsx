@@ -3,12 +3,16 @@ import toast, {Toaster} from "react-hot-toast";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import config from "../config.json"
+import {useContext} from "react";
+import AuthContext from "../authContext.ts";
 
 export const Registration = () => {
     const navigate = useNavigate();
     const timeoutInMsBeforeSuccessfulRedirect = 3000;
+    const {setUsername} = useContext(AuthContext);
 
     function register(formData: FormData) {
+
         const email = formData.get("email") as string
         const username = formData.get("username") as string
         const firstName = formData.get("firstName") as string
@@ -19,12 +23,13 @@ export const Registration = () => {
             return
         }
 
-        const user = {email: email, username: username, firstName: firstName, lastName: lastName}
-        console.log("Receive registration request for:" + user)
+        const userFormData = {email: email, username: username, firstName: firstName, lastName: lastName}
+        console.log("Receive registration request for:" + userFormData)
         axios
-            .post(config.API_URL + "/users/new", user)
+            .post(config.API_URL + "/users/new", userFormData)
             .then((response) => {
                 console.log("registration ok", response);
+                setUsername(username);
                 toast.success("Registration successful", {
                     'position': 'top-right',
                     removeDelay: timeoutInMsBeforeSuccessfulRedirect
