@@ -1,44 +1,29 @@
-import express, {Request, Response} from "express";
-import {Pool} from 'pg';
-import router from "./user-http";
+import express from "express";
+import {createUserRouter} from "./user-http";
 import {Config} from "./config";
+import cors from 'cors';
+import {PrismaPg} from "@prisma/adapter-pg";
+import {PrismaClient} from '../src/generated/prisma/client';
 
 require('dotenv').config()
-import cors from 'cors';
 
 const app = express();
 app.use(express.json());
 app.use(cors())
-app.use(router);
 
-let config: Config;
-export let pool: Pool;
+export let config: Config;
 
 async function initConfig(): Promise<void> {
     try {
         const port = process.env.PORT;
-        const dbUser = process.env.DB_USER;
-        const dbHost = process.env.DB_HOST;
-        const dbName = process.env.DB_NAME;
-        const dbPassword = process.env.DB_PASSWORD;
-        const dbPort = process.env.DB_PORT;
+        const databaseUrl = process.env.DATABASE_URL;
 
         if (!port) throw new Error('PORT environment variable is required');
-        if (!dbUser) throw new Error('DB_USER environment variable is required');
-        if (!dbHost) throw new Error('DB_HOST environment variable is required');
-        if (!dbName) throw new Error('DB_NAME environment variable is required');
-        if (!dbPassword) throw new Error('DB_PASSWORD environment variable is required');
-        if (!dbPort) throw new Error('DB_PORT environment variable is required');
+        if (!databaseUrl) throw new Error('DATABASE_URL environment variable is required');
 
         config = {
             port: parseInt(port),
-            db: {
-                user: dbUser,
-                host: dbHost,
-                database: dbName,
-                password: dbPassword,
-                port: parseInt(dbPort),
-            },
+            databaseUrl: databaseUrl
         };
         console.log('Config is initialized successfully');
     } catch (error) {
@@ -47,43 +32,40 @@ async function initConfig(): Promise<void> {
     }
 }
 
-async function initializeDatabase(): Promise<void> {
+async function pingDatabase(): Promise<void> {
+    let prisma: PrismaClient | null = null;
     try {
-        pool = new Pool({
-            user: config.db.user,
-            host: config.db.host,
-            database: config.db.database,
-            password: config.db.password,
-            port: config.db.port,
+        const adapter = new PrismaPg({
+            connectionString: config.databaseUrl,
         });
+        prisma = new PrismaClient({adapter});
+        await prisma.$connect()
+        await prisma.$queryRaw`SELECT 1 as test`
+        console.log('Database is ready');
 
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS users (
-                 id SERIAL PRIMARY KEY,
-                 email VARCHAR(255) UNIQUE NOT NULL,
-                 username VARCHAR(255) UNIQUE NOT NULL,
-                 first_name VARCHAR(100) NOT NULL,
-                 last_name VARCHAR(100) NOT NULL,
-                 password VARCHAR(100) NOT NULL
-            )
-        `);
-        console.log('Database initialized: users table is ready');
     } catch (error) {
-        console.error('Error initializing database:', error);
-        throw error;
+        console.error('Error pinging database:', error);
+        throw new Error(`Database connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+        if (prisma) {
+            await prisma.$disconnect();
+        }
     }
 }
 
 initConfig()
-    .then(() =>
-        initializeDatabase()
-            .then(() => {
-                app.listen(config.port, () => {
-                    console.log(`App listening on port ${config.port}`);
-                });
-            })
-            .catch((error) => {
-                console.error('Failed to initialize application:', error);
-                process.exit(1);
-            }));
+    .then(() => {
+        const router = createUserRouter(config);
+        app.use(router);
+        return pingDatabase();
+    })
+    .then(() => {
+        app.listen(config.port, () => {
+            console.log(`App listening on port ${config.port}`);
+        });
+    })
+    .catch((error) => {
+        console.error('Failed to initialize application:', error);
+        process.exit(1);
+    });
 

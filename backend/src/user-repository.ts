@@ -1,111 +1,104 @@
-import {pool} from "./index";
 import {User, UserResponse} from "./user";
+import {PrismaClient} from '../src/generated/prisma/client';
+import {PrismaPg} from "@prisma/adapter-pg";
+import {Config} from "./config";
 
 export class UserRepository {
+    private prisma: PrismaClient;
 
-    save(user: User): Promise<number> {
+    constructor(config: Config) {
+        const adapter = new PrismaPg({
+            connectionString: config.databaseUrl,
+        });
+        this.prisma = new PrismaClient({adapter});
+    }
+
+    async save(user: User): Promise<number> {
         console.log('Saving user to database:', user);
-        return new Promise((resolve, reject) => {
-            pool.query(
-                'INSERT INTO users (username, email, first_name, last_name, password) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-                [user.username, user.email, user.firstName, user.lastName, user.password],
-                (error, results) => {
-                    if (error) {
-                        reject(error);
-                        return;
-                    }
-                    const userId = results.rows[0].id;
-                    resolve(userId);
-                })
-        });
-    }
-
-    update(userId: number, user: User): Promise<void> {
-        return new Promise((resolve, reject) => {
-            pool.query(
-                `UPDATE users 
-                           SET username = $2, 
-                               email = $3, 
-                               first_name = $4, 
-                               last_name = $5 
-                           WHERE id = $1`,
-                [userId, user.username, user.email, user.firstName, user.lastName],
-                (error, results) => {
-                    if (error) {
-                        reject(error);
-                        return;
-                    }
-                    resolve();
-                })
-        });
-    }
-
-    usernameExists(username: string): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            pool.query(
-                'SELECT COUNT(1) FROM users WHERE username = $1',
-                [username],
-                (error, results) => {
-                    if (error) {
-                        reject(error);
-                        return;
-                    }
-                    const count = parseInt(results.rows[0].count, 10);
-                    resolve(count > 0);
+        try {
+            const createdUser = await this.prisma.user.create({
+                data: {
+                    username: user.username,
+                    email: user.email,
+                    first_name: user.firstName,
+                    last_name: user.lastName,
+                    password: user.password
                 }
-            );
-        });
+            });
+            return createdUser.id;
+        } catch (error) {
+            console.error('Error saving user:', error);
+            throw error;
+        }
     }
 
-    emailExists(email: string): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            pool.query(
-                'SELECT COUNT(1) FROM users WHERE email = $1',
-                [email],
-                (error, results) => {
-                    if (error) {
-                        reject(error);
-                        return;
-                    }
-                    const count = parseInt(results.rows[0].count, 10);
-                    resolve(count > 0);
+    async update(userId: number, user: User): Promise<void> {
+        try {
+            await this.prisma.user.update({
+                where: { id: userId },
+                data: {
+                    username: user.username,
+                    email: user.email,
+                    first_name: user.firstName,
+                    last_name: user.lastName
                 }
-            );
-        });
+            });
+        } catch (error) {
+            console.error('Error updating user:', error);
+            throw error;
+        }
     }
 
-    findByEmail(email: string): Promise<UserResponse | null> {
+    async usernameExists(username: string): Promise<boolean> {
+        try {
+            const count = await this.prisma.user.count({
+                where: { username: username }
+            });
+            return count > 0;
+        } catch (error) {
+            console.error('Error checking username existence:', error);
+            throw error;
+        }
+    }
+
+    async emailExists(email: string): Promise<boolean> {
+        try {
+            const count = await this.prisma.user.count({
+                where: { email: email }
+            });
+            return count > 0;
+        } catch (error) {
+            console.error('Error checking email existence:', error);
+            throw error;
+        }
+    }
+
+    async findByEmail(email: string): Promise<UserResponse | null> {
         console.log('Finding user by email:', email);
-        return new Promise((resolve, reject) => {
-            pool.query(
-                'SELECT * FROM users WHERE email = $1',
-                [email],
-                (error, results) => {
-                    if (error) {
-                        console.log('Error querying database:', error);
-                        reject(error);
-                        return;
-                    }
-                    if (results.rows.length === 0) {
-                        console.log('No user found with email:', email);
-                        resolve(null);
-                        return;
-                    }
-                    const row = results.rows[0];
-                    console.log('User found:', row);
-                    const user: UserResponse = {
-                        id: row.id,
-                        email: row.email,
-                        username: row.username,
-                        firstName: row.first_name,
-                        lastName: row.last_name
-                    };
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { email: email }
+            });
 
-                    resolve(user);
+            if (!user) {
+                console.log('No user found with email:', email);
+                return null;
+            }
 
-                }
-            );
-        });
+            console.log('User found:', user);
+            const userResponse: UserResponse = {
+                id: user.id,
+                email: user.email,
+                username: user.username,
+                firstName: user.first_name,
+                lastName: user.last_name
+            };
+
+            return userResponse;
+        } catch (error) {
+            console.error('Error finding user by email:', error);
+            throw error;
+        }
     }
 
 }
