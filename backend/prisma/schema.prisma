@@ -13,10 +13,61 @@ datasource db {
 }
 
 model User {
-  id         Int    @id @default(autoincrement())
-  email      String @unique
-  username   String @unique
-  first_name String
-  last_name  String
-  password   String
+  id        Int    @id @default(autoincrement())
+  email     String @unique
+  firstName String
+  lastName  String
+  username  String
+  password  String
+
+  member Member?
+}
+
+model Member {
+  id Int @id @default(autoincrement())
+
+  user     User      @relation(fields: [userId], references: [id])
+  userId   Int       @unique
+  posts    Post[]
+  votes    Vote[]
+  comments Comment[]
+}
+
+model Post {
+  id             Int       @id @default(autoincrement())
+  memberPostedBy Member    @relation(fields: [memberId], references: [id])
+  memberId       Int
+  postType       String // 'Text' or 'Link'
+  title          String
+  content        String
+  comments       Comment[]
+  dateCreated    DateTime  @default(now())
+  votes          Vote[]
+}
+
+model Comment {
+  id Int @id @default(autoincrement())
+
+  postId Int
+  post   Post   @relation(fields: [postId], references: [id])
+  text   String
+
+  memberId       Int
+  memberPostedBy Member @relation(fields: [memberId], references: [id])
+
+  parentCommentId Int?
+  parentComment   Comment?  @relation("Replies", fields: [parentCommentId], references: [id])
+  replyComments   Comment[] @relation("Replies")
+}
+
+model Vote {
+  id Int @id @default(autoincrement())
+
+  postId        Int
+  postBelongsTo Post @relation(fields: [postId], references: [id])
+
+  memberId       Int
+  memberPostedBy Member @relation(fields: [memberId], references: [id])
+
+  voteType String // 'Upvote' or 'Downvote'
 }

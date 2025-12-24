@@ -20,8 +20,8 @@ export class UserRepository {
                 data: {
                     username: user.username,
                     email: user.email,
-                    first_name: user.firstName,
-                    last_name: user.lastName,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
                     password: user.password
                 }
             });
@@ -39,8 +39,8 @@ export class UserRepository {
                 data: {
                     username: user.username,
                     email: user.email,
-                    first_name: user.firstName,
-                    last_name: user.lastName
+                    firstName: user.firstName,
+                    lastName: user.lastName
                 }
             });
         } catch (error) {
@@ -86,15 +86,13 @@ export class UserRepository {
             }
 
             console.log('User found:', user);
-            const userResponse: UserResponse = {
+            return {
                 id: user.id,
                 email: user.email,
                 username: user.username,
-                firstName: user.first_name,
-                lastName: user.last_name
+                firstName: user.firstName,
+                lastName: user.lastName
             };
-
-            return userResponse;
         } catch (error) {
             console.error('Error finding user by email:', error);
             throw error;
