@@ -44,10 +44,16 @@ export const Registration = () => {
             });
     }
 
+    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        register(formData);
+    }
+
     return (
         <Layout>
             <Toaster/>
-            <form action={register}>
+            <form onSubmit={handleSubmit}>
                 <div className="registration-form">
                     <div>Create Account</div>
                     <input className="registration email"
