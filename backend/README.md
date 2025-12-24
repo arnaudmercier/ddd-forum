@@ -10,6 +10,15 @@
  docker compose -f ./etc/docker-compose.yaml up 
 ```
 
+### Prisma
+
+To generate Prisma client and run migrations, use the following commands:
+
+```bash
+npx prisma migrate dev --name init
+npx prisma generate
+```
+
 ## Endpoints
 
 ### new users
