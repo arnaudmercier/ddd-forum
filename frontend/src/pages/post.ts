@@ -4,4 +4,6 @@ export interface Post {
     content: string;
     memberId: number;
     createdAt: string;
+    upvotes: number;
+    downvotes: number;
 }
