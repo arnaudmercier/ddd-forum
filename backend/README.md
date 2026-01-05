@@ -15,8 +15,12 @@
 To generate Prisma client and run migrations, use the following commands:
 
 ```bash
+# Migrate the database
 npx prisma migrate dev --name init
+# Generate Prisma client
 npx prisma generate
+# Seed the database
+npx prisma db seed 
 ```
 
 ## Endpoints
