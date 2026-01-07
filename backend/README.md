@@ -45,3 +45,10 @@ curl -X POST "http://localhost:3000/users/edit/1" -H "Content-Type: application/
 # 200
 curl -X POST "http://localhost:3000/users?email=john@test.com" 
 ```
+
+### find all posts sorted by creation date desc
+
+```bash
+# 200
+curl -X GET "http://localhost:3000/posts" 
+``` 
