@@ -7,25 +7,25 @@ export const PostList = ({posts}: { posts: Post[] }) => {
         () => {
             return posts.reduce((acc, post) => ({
                 ...acc,
-                [post.id]: {upvotes: post.upvotes || 0, downvotes: post.downvotes || 0}
+                [post.id]: {upvotes: post.upvotes, downvotes: post.downvotes}
             }), {});
         }
     );
 
-    function upvote(postId: number) {
+    function upvote(postId: number, defaultValue: number) {
         setPostVotes(prev => {
             return {
                 ...prev,
                 [postId]: {
                     ...prev[postId],
-                    upvotes: (prev[postId]?.upvotes || 0) + 1
+                    upvotes: (prev[postId]?.upvotes || defaultValue) + 1
                 }
             };
         });
     }
 
-    function downvote(postId: number) {
-        const currentNetVotes = (postVotes[postId]?.upvotes || 0) - (postVotes[postId]?.downvotes || 0);
+    function downvote(postId: number, defaultUpvote: number, defaultDownvote: number) {
+        const currentNetVotes = (postVotes[postId]?.upvotes ||defaultUpvote) - (postVotes[postId]?.downvotes || defaultDownvote);
 
         if (currentNetVotes <= 0) {
             return;
@@ -36,7 +36,7 @@ export const PostList = ({posts}: { posts: Post[] }) => {
                 ...prev,
                 [postId]: {
                     ...prev[postId],
-                    downvotes: (prev[postId]?.downvotes || 0) + 1
+                    downvotes: (prev[postId]?.downvotes || defaultDownvote) + 1
                 }
             };
         });
@@ -48,14 +48,14 @@ export const PostList = ({posts}: { posts: Post[] }) => {
                 <div key={post.id} className="post-item">
                     <div className="post-item-votes">
                         <div className="post-item-upvote" onClick={() => {
-                            upvote(post.id)
+                            upvote(post.id, post.upvotes)
                         }}>
                             <img src="/assets/arrow.svg" alt="Upvote"/>
                         </div>
-                        <div>{(postVotes[post.id]?.upvotes || 0) - (postVotes[post.id]?.downvotes || 0)}</div>
+                        <div>{(postVotes[post.id]?.upvotes || post.upvotes) - (postVotes[post.id]?.downvotes || post.downvotes)}</div>
                         <div className="post-item-downvote">
                             <img src="/assets/arrow.svg" alt="Downvote" onClick={() => {
-                                downvote(post.id)
+                                downvote(post.id, post.upvotes, post.downvotes)
                             }}/>
                         </div>
                     </div>
@@ -63,8 +63,8 @@ export const PostList = ({posts}: { posts: Post[] }) => {
                         <div className="post-item-title">{post.title}</div>
                         <div className="post-item-details">
                             <div>{moment().to(post.createdAt)}</div>
-                            <a href="/member/username"> by username </a>
-                            <div>comments</div>
+                            <a href="/member/username"> by {post.username}</a>
+                            <div>{post.comments} comments</div>
                         </div>
                     </div>
                 </div>

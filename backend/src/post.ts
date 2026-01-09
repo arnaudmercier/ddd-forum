@@ -5,9 +5,10 @@ export interface PostDto {
     title: string;
     content: string;
     postType: string;
-    dateCreated: string;
+    createdAt: string;
     username: string;
-    votes: number;
+    upvotes: number;
+    downvotes: number;
     comments: number;
 }
 
