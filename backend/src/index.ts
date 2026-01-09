@@ -1,4 +1,4 @@
-import express, {Request, Response} from "express";
+import express from "express";
 import {createUserRouter} from "./user-http";
 import {Config} from "./config";
 import cors from 'cors';
@@ -55,8 +55,10 @@ async function pingDatabase(): Promise<void> {
 
 initConfig()
     .then(() => {
-        const router = createUserRouter(config);
-        app.use(router);
+        const userRouter = createUserRouter(config);
+        app.use(userRouter);
+        const postRouter = require('./post-http').createPostRouter(config);
+        app.use(postRouter);
         return pingDatabase();
     })
     .then(() => {
