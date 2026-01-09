@@ -1,4 +1,4 @@
-import {Comment, Post, PrismaClient, User, Vote} from "@prisma/client";
+import {PrismaClient} from "@prisma/client";
 import {PrismaPg} from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
@@ -6,9 +6,8 @@ const adapter = new PrismaPg({
 });
 const prisma = new PrismaClient({adapter});
 
-const initialUsers: User[] = [
+const initialUsers = [
     {
-        id: 1,
         email: "bobvance@gmail.com",
         firstName: "Bob",
         lastName: "Vance",
@@ -16,7 +15,6 @@ const initialUsers: User[] = [
         password: '123'
     },
     {
-        id: 2,
         email: "tonysoprano@gmail.com",
         firstName: "Tony",
         lastName: "Soprano",
@@ -24,7 +22,6 @@ const initialUsers: User[] = [
         password: '123'
     },
     {
-        id: 3,
         email: "billburr@gmail.com",
         firstName: "Bill",
         lastName: "Burr",
@@ -33,99 +30,109 @@ const initialUsers: User[] = [
     },
 ];
 
-const initialMemberUserIds = [
-    {memberId: 1, userId: 1},
-    {memberId: 2, userId: 2},
-    {memberId: 3, userId: 3},
-];
+let createdUsers: any[] = [];
+let createdMembers: any[] = [];
 
-const initialPosts: Post[] = [
+const initialPosts = [
     {
-        id: 1,
         title: 'First post!',
         content: "This is bob vances first post",
         postType: "Text",
         dateCreated: new Date(),
-        memberId: 1,
     },
     {
-        id: 2,
         title: 'Second post!',
         content: "This is bobs second post",
         postType: "Text",
         dateCreated: new Date(),
-        memberId: 1,
     },
     {
-        id: 3,
         title: 'another post',
         content: "This is tonys first post",
         postType: "Text",
         dateCreated: new Date(),
-        memberId: 2,
     },
     {
-        id: 4,
         title: 'Links',
         content: "This is a link post",
         postType: "<https://khalilstemmler.com>",
         dateCreated: new Date(),
-        memberId: 2,
     },
 ];
 
-const initialPostVotes: Vote[] = [
-    // Everyone upvotes their own first post
-    {id: 1, postId: 1, voteType: 'Upvote', memberId: 1},
-    {id: 2, postId: 2, voteType: 'Upvote', memberId: 1},
-    {id: 3, postId: 3, voteType: 'Upvote', memberId: 2},
-    {id: 4, postId: 4, voteType: 'Upvote', memberId: 2},
-
-    // Tony's post upvoted by Bob
-    {id: 5, postId: 3, voteType: 'Upvote', memberId: 1},
-
-    // Bob's second post downvoted by Bill
-    {id: 6, postId: 2, voteType: 'Downvote', memberId: 3},
-];
-
-const initialPostComments: Comment[] = [
-    {id: 1, text: 'I posted this!', memberId: 1, postId: 1, parentCommentId: null},
-    {id: 2, text: 'Nice', memberId: 2, postId: 2, parentCommentId: null}
-];
-
 async function seed() {
+    console.log('Starting database seeding...');
 
-    for (const user of initialUsers) {
+    for (let i = 0; i < initialUsers.length; i++) {
+        const user = initialUsers[i];
+        console.log(`Creating user: ${user.username}`);
+
         const newUser = await prisma.user.create({
             data: user
         });
+        createdUsers.push(newUser);
 
-        await prisma.member.create({
+        console.log(`Creating member for user: ${user.username}`);
+        const newMember = await prisma.member.create({
             data: {
                 user: {
                     connect: {id: newUser.id},
                 },
             },
         });
+        createdMembers.push(newMember);
     }
 
-    for (const post of initialPosts) {
-        await prisma.post.create({
+    const postsWithMembers = [
+        { ...initialPosts[0], memberId: createdMembers[0].id }, // Bob's first post
+        { ...initialPosts[1], memberId: createdMembers[0].id }, // Bob's second post
+        { ...initialPosts[2], memberId: createdMembers[1].id }, // Tony's first post
+        { ...initialPosts[3], memberId: createdMembers[1].id }, // Tony's link post
+    ];
+
+    const createdPosts = [];
+    for (const post of postsWithMembers) {
+        console.log(`Creating post: ${post.title}`);
+        const newPost = await prisma.post.create({
             data: post,
         });
+        createdPosts.push(newPost);
     }
 
+    const initialPostVotes = [
+        {postId: createdPosts[0].id, voteType: 'Upvote', memberId: createdMembers[0].id}, // Bob upvotes his first post
+        {postId: createdPosts[1].id, voteType: 'Upvote', memberId: createdMembers[0].id}, // Bob upvotes his second post
+        {postId: createdPosts[2].id, voteType: 'Upvote', memberId: createdMembers[1].id}, // Tony upvotes his first post
+        {postId: createdPosts[3].id, voteType: 'Upvote', memberId: createdMembers[1].id}, // Tony upvotes his link post
+
+        {postId: createdPosts[2].id, voteType: 'Upvote', memberId: createdMembers[0].id}, // Bob upvotes Tony's post
+
+        {postId: createdPosts[1].id, voteType: 'Downvote', memberId: createdMembers[2].id}, // Bill downvotes Bob's second post
+    ];
+
     for (const vote of initialPostVotes) {
+        console.log(`Creating vote: ${vote.voteType} on post ${vote.postId} by member ${vote.memberId}`);
         await prisma.vote.create({
             data: vote,
         });
     }
 
+    const initialPostComments = [
+        {text: 'I posted this!', memberId: createdMembers[0].id, postId: createdPosts[0].id, parentCommentId: null},
+        {text: 'Nice', memberId: createdMembers[1].id, postId: createdPosts[1].id, parentCommentId: null}
+    ];
+
     for (const comment of initialPostComments) {
+        console.log(`Creating comment: ${comment.text}`);
         await prisma.comment.create({
             data: comment,
         });
     }
+
+    console.log('Database seeding completed successfully!');
 }
 
-seed();
+seed().catch((error) => {
+    console.error('Error during seeding:', error);
+    process.exit(1);
+});
