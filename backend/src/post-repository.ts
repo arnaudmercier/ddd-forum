@@ -45,9 +45,10 @@ export class PostRepository {
             title: post.title,
             content: post.content,
             postType: post.postType,
-            dateCreated: post.dateCreated.toISOString(),
+            createdAt: post.dateCreated.toISOString(),
             username: post.memberPostedBy.user.username,
-            votes: upvotes - downvotes,
+            upvotes: upvotes,
+            downvotes: downvotes,
             comments: post.comments.length
         };
     }
