@@ -60,7 +60,7 @@ export function createUserRouter(config: Config): Router {
 
     router.post('/users/edit/:userId', cors(), async (request: Request, response: Response) => {
         try {
-            const userId = parseInt(request.params.userId);
+            const userId = parseInt(String(request.params.userId));
             console.log(`Called /users/ endpoint with userId: ${userId}`);
 
             if (returnHttp400WhenValidationError(request, response)) {
