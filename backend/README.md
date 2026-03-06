@@ -2,6 +2,10 @@
 
 > This is where you'll write your code-first implementation of the User Story from DDDForum. You can [see the assignment page for more details](https://www.essentialist.dev/products/the-software-essentialist/categories/2153149734/posts/2168948146).
 
+## Before starting
+
+Be sure to be in the `backend` directory before running any of the commands below.
+
 ## Postgres
 
 ### To run Postgres locally using Docker, you can use the following command:
@@ -24,7 +28,13 @@ npx prisma generate
 npx prisma db seed
 # Clean the values of the database
 npx prisma migrate reset
+```
 
+## Run the application
+
+```bash
+# Run the application
+npm run start:dev 
 ```
 
 ## Endpoints
