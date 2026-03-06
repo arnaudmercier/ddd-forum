@@ -10,7 +10,13 @@ export function createPostRouter(config: Config): Router {
 
     router.get('/posts', cors(), async (request: Request, response: Response) => {
         try {
+            const { sort } = request.query;
 
+            if (sort !== 'recent') {
+                return response.status(400).json(
+                    new ApiResponse('SortValueNotSupported', undefined, false)
+                );
+            }
             console.log(`Call /posts endpoint`);
             const posts = await postRepository.findPosts();
             return response.status(200).json(
