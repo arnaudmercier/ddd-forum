@@ -8,7 +8,7 @@ export const MainPage = () => {
 
     const [posts, setPosts] = useState([]);
     useEffect(() => {
-        axios.get(config.API_URL + "/posts")
+        axios.get(config.API_URL + "/posts?sort=recent")
             .then((response) => {
                 setPosts(response.data.data);
             })
