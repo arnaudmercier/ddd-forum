@@ -40,7 +40,15 @@ export const Registration = () => {
             })
             .catch((err) => {
                 console.log("registration ko", err);
-                toast.error('Error from API: ' + err.message, {'position': 'top-right'});
+                const errorCode = err.response?.data?.error;
+                const errorMessages: Record<string, string> = {
+                    'EmailAlreadyInUse': 'This email address is already in use.',
+                    'UsernameAlreadyTaken': 'This username is already taken.',
+                    'ValidationError': 'Please fill in all required fields.',
+                    'MissingEmailQueryParameter': 'Email is required.',
+                };
+                const message = errorMessages[errorCode] ?? 'Something went wrong. Please try again.';
+                toast.error(message, {'position': 'top-right'});
             });
     }
 
